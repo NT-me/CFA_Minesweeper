@@ -2,20 +2,23 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (Html, div, h1, img, text, button)
-import Html.Attributes exposing (src, class, style)
+import Html.Attributes exposing (src, class, style, value)
 import Html.Events exposing (onClick)
+import Service
 import Mine
+import Type exposing (Model)
+import Type exposing (Msg(..))
+import Service exposing (..)
 
 
-type alias Model =
-    {listPosMine : List ( Int, Int )}
+
 
 
 exampleGenerateRandomMines : Cmd Msg
 exampleGenerateRandomMines =
     Mine.generateRandomMines
-        { width = 5
-        , height = 5
+        { width = 4
+        , height = 4
         , minMines = 1
         , maxMines = 2
         , initialX = 0
@@ -26,13 +29,10 @@ exampleGenerateRandomMines =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {listPosMine = []}, exampleGenerateRandomMines )
+    ( {listPosMine = [], uncovereds = []}, exampleGenerateRandomMines )
 
 
-type Msg
-    = MinesGenerated (List ( Int, Int ))
-    | EmptyCase
-    | BombCase
+
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -40,32 +40,22 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase -> (model, Cmd.none)
+    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none) 
 
     BombCase -> (model, Cmd.none)
 
 
 
-determineCaseMsg : List (Int, Int) -> Int -> Int -> Msg
-determineCaseMsg bombPosList i j =
-    case bombPosList of
-      [] -> EmptyCase
-      h :: t -> if (h == (i, j)) then
-          BombCase
-          else
-              determineCaseMsg t i j
 
+
+--tabGrid : List (Int Int) -> List (Int Int)-> Int -> Int -> Int -> Int -> List (Int Int)
+--tabGrid posMine retList col row maxCol maxRow =
+  --  case posMine of
+    --    [] -> retList
+      --  h :: t -> 
 
 -- Valeur de retour, 0, 0, maximum colonne, maximum ligne
-renderGrid : List (Html Msg) -> Int -> Int -> Int -> Int -> Model ->List (Html Msg)
-renderGrid msgList col row maxCol maxRow model =
-  if col >= maxCol then
-      if row == (maxRow - 1)  then
-          msgList -- Retour de la grille de bouton
-      else
-          renderGrid msgList 0 (row + 1) maxCol maxRow model -- On change de ligne
-  else
-      renderGrid (List.append msgList (button [class "grid-item case", onClick (determineCaseMsg model.listPosMine col row) ] [ text "+" ] :: [])) (col + 1) row maxCol maxRow model
+
 
 view : Model -> Html Msg
 view model =
@@ -73,7 +63,7 @@ view model =
         [
         div [] [h1 [] [text "Démineur"]],
         div [class "wrapper", style "grid-template-columns" "repeat(5, 1fr)"]
-          (renderGrid [] 0 0 5 5 model)
+          (Service.renderGrid [] 0 0 5 5 model)
         ]
 
 
