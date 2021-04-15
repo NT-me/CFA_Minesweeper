@@ -36,7 +36,7 @@ relaunch ({ minMines, initialY, initialX } as options) l =
 
 
 randomMinesGenerator : Options -> Generator (List Mine)
-randomMinesGenerator ({ width, height, minMines, maxMines } as options) =
+randomMinesGenerator ({minMines, maxMines } as options) =
     Random.int minMines maxMines
         |> Random.andThen (randomMinesGeneratorList options)
         |> Random.map (Set.fromList >> Set.toList)

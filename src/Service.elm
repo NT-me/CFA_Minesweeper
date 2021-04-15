@@ -1,11 +1,12 @@
 module Service exposing (..)
 
-import Html exposing (Html, div, h1, img, text, button)
-import Html.Attributes exposing (src, class, style, value)
+import Html exposing (Html, text, button)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Type exposing (Model)
 import Type exposing (Msg(..))
 import Type exposing (UncoveredValueCase)
+import String exposing (String)
 
 
 proximityBomb : List (Int, Int) ->(Int, Int) -> Int -> Int
@@ -44,5 +45,30 @@ renderGrid msgList col row maxCol maxRow model =
       else
           renderGrid msgList 0 (row + 1) maxCol maxRow model -- On change de ligne
   else
-      renderGrid (List.append msgList (button [class "grid-item case", onClick (determineCaseMsg model.listPosMine col row) ] [ text "+" ] :: [])) (col + 1) row maxCol maxRow model
+      renderGrid (List.append msgList ((displayButtons model col row) :: [])) (col + 1) row maxCol maxRow model
+
+getValue : List (UncoveredValueCase) -> Int -> Int -> String 
+getValue uncoveredcases col row =
+    case uncoveredcases of 
+        [] -> " "
+        h :: t -> if (col,row) == h.position then 
+           (String.fromInt h.value)
+                else
+                    getValue t col row
+
+displayButtons : Model -> Int -> Int -> Html Msg
+displayButtons model col row = 
+    if model.bombClicked then 
+        if List.member (col,row) model.listPosMine then 
+            button [class "grid-item case" ] [ text "💣"]
+        else
+            let value = getValue model.uncovereds col row in
+            button [class "grid-item case" ] [ text value ]
+    else 
+        let value = getValue model.uncovereds col row in
+        button [class "grid-item case", onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
+    
+
+
+
 

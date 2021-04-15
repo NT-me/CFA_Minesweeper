@@ -7,7 +7,9 @@ type Msg
 
 type alias Model =
     {listPosMine : List ( Int, Int ),
-    uncovereds : List UncoveredValueCase}
+    uncovereds : List UncoveredValueCase,
+    bombClicked : Bool}
+
 
     
 type alias UncoveredValueCase =
