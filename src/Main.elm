@@ -15,8 +15,8 @@ exampleGenerateRandomMines =
     Mine.generateRandomMines
         { width = 4
         , height = 4
-        , minMines = 1
-        , maxMines = 2
+        , minMines = 5
+        , maxMines = 5
         , initialX = 0
         , initialY = 0
         }
@@ -36,7 +36,7 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none) 
+    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
@@ -49,7 +49,7 @@ update msg model =
 --tabGrid posMine retList col row maxCol maxRow =
   --  case posMine of
     --    [] -> retList
-      --  h :: t -> 
+      --  h :: t ->
 
 -- Valeur de retour, 0, 0, maximum colonne, maximum ligne
 

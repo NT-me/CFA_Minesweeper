@@ -35,5 +35,53 @@ img {
 }
 
 .case{
-  border: 1px solid
+  border: 1px solid;
+  font-size : 220%;
+
+}
+
+#bomb{
+  border: 5px solid black;
+  background-color: #8b0000;
+}
+
+#nb1{
+  border: 1px solid black;
+  color: blue;
+
+}
+
+#nb2{
+  border: 2px solid black;
+  color: green;
+}
+
+#nb3{
+  border: 3px solid black;
+  color: red;
+}
+
+#nb4{
+  border: 4px solid black;
+  color: yellow;
+}
+
+#nb5{
+  border: 5px solid black;
+  color: purple;
+}
+
+#nb6{
+  border: 6px solid black;
+  color: black;
+}
+
+#nb7{
+  border: 7px solid black;
+  color: pink;
+}
+
+#nb8{
+  border: 8px solid black;
+  text-color: white;
 }

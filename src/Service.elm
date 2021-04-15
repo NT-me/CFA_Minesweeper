@@ -1,7 +1,7 @@
 module Service exposing (..)
 
 import Html exposing (Html, text, button)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick)
 import Type exposing (Model)
 import Type exposing (Msg(..))
@@ -14,17 +14,17 @@ proximityBomb bombPosList posClick retValue =
     case bombPosList of
        [] -> retValue
        h :: t -> if (abs((Tuple.first h) - (Tuple.first posClick)) <= 1 &&
-                        abs((Tuple.second h) - (Tuple.second posClick)) <= 1) then 
+                        abs((Tuple.second h) - (Tuple.second posClick)) <= 1) then
                             proximityBomb t posClick (retValue + 1)
                  else proximityBomb t posClick retValue
-        
+
 --(abs((Tuple.first h) - (Tuple.first posClick)) <= 1) && (abs((Tuple.second h) - (Tuple.second posClick)) <= 1))
 
 
 uncoveredList : List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
 uncoveredList bombPosList uncovereds posClick =
-    
-    let 
+
+    let
         ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick}
     in
         ucase :: uncovereds
@@ -47,28 +47,23 @@ renderGrid msgList col row maxCol maxRow model =
   else
       renderGrid (List.append msgList ((displayButtons model col row) :: [])) (col + 1) row maxCol maxRow model
 
-getValue : List (UncoveredValueCase) -> Int -> Int -> String 
+getValue : List (UncoveredValueCase) -> Int -> Int -> String
 getValue uncoveredcases col row =
-    case uncoveredcases of 
+    case uncoveredcases of
         [] -> " "
-        h :: t -> if (col,row) == h.position then 
+        h :: t -> if (col,row) == h.position then
            (String.fromInt h.value)
                 else
                     getValue t col row
 
 displayButtons : Model -> Int -> Int -> Html Msg
-displayButtons model col row = 
-    if model.bombClicked then 
-        if List.member (col,row) model.listPosMine then 
-            button [class "grid-item case" ] [ text "💣"]
+displayButtons model col row =
+    if model.bombClicked then
+        if List.member (col,row) model.listPosMine then
+            button [class "grid-item case", id "bomb" ] [ text "💣"]
         else
             let value = getValue model.uncovereds col row in
-            button [class "grid-item case" ] [ text value ]
-    else 
+            button [class "grid-item case", id ("nb"++value) ] [ text value ]
+    else
         let value = getValue model.uncovereds col row in
-        button [class "grid-item case", onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
-    
-
-
-
-
+        button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
