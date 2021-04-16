@@ -79,5 +79,8 @@ displayButtons model col row =
             button [class "grid-item case", id ("nb"++value) ] [ text value ]
     else
         let value = getValue model.uncovereds col row in
-        button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
+        if value == "0" then 
+            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] [ text "" ] --TODO : changer le CSS pour reconnaitre les cases clickées
+        else
+            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
 
