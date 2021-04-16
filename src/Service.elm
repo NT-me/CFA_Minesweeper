@@ -21,16 +21,18 @@ proximityBomb bombPosList posClick retValue =
 --(abs((Tuple.first h) - (Tuple.first posClick)) <= 1) && (abs((Tuple.second h) - (Tuple.second posClick)) <= 1))
 
 recDown bombPosList uncovereds posClick =
-  if ((Tuple.second posClick + 1 ) <= 10)   then
-      recDown bombPosList ({value = (proximityBomb bombPosList posClick 0), position = posClick} :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1))
-  else
-    uncovereds
+  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
+    if ((Tuple.second posClick + 1) < 10 &&  ucase.value == 0)  then
+        recDown bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1))
+    else
+      ucase :: uncovereds
 
 recUp bombPosList uncovereds posClick =
-  if ((Tuple.second posClick - 1 ) >= 0)   then
-      recUp bombPosList ({value = (proximityBomb bombPosList posClick 0), position = posClick} :: uncovereds) (Tuple.first posClick, (Tuple.second posClick - 1))
-  else
-    uncovereds
+  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
+    if ((Tuple.second posClick - 1) > -1 &&  ucase.value == 0)  then
+        recDown bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick - 1))
+    else
+      ucase :: uncovereds
 
 uncoveredList : List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
 uncoveredList bombPosList uncovereds posClick =
