@@ -13,10 +13,10 @@ import Service exposing (..)
 exampleGenerateRandomMines : Cmd Msg
 exampleGenerateRandomMines =
     Mine.generateRandomMines
-        { width = 4
-        , height = 4
-        , minMines = 5
-        , maxMines = 5
+        { width = 10
+        , height = 10
+        , minMines = 1
+        , maxMines = 1
         , initialX = 0
         , initialY = 0
         }
@@ -25,7 +25,7 @@ exampleGenerateRandomMines =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {listPosMine = [], uncovereds = [], bombClicked = False}, exampleGenerateRandomMines )
+    ( {listPosMine = [], uncovereds = [], bombClicked = False }, exampleGenerateRandomMines )
 
 
 
@@ -59,8 +59,8 @@ view model =
     div []
         [
         div [] [h1 [] [text "Démineur"]],
-        div [class "wrapper", style "grid-template-columns" "repeat(5, 1fr)"]
-          (Service.renderGrid [] 0 0 5 5 model)
+        div [class "wrapper", style "grid-template-columns" "repeat(10, 1fr)"]
+          (Service.renderGrid [] 0 0 10 10 model)
         ]
 
 
