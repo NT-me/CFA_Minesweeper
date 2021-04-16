@@ -23,19 +23,8 @@ proximityBomb bombPosList posClick retValue =
 
 uncoveredList : List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
 uncoveredList bombPosList uncovereds posClick =
-<<<<<<< HEAD
-
-    let
-        ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick}
-    in
-        ucase :: uncovereds
-=======
     let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-        if ucase.value == 0 then
-            ucase :: (uncoveredList bombPosList uncovereds ((Tuple.first posClick, (Tuple.second posClick + 1))))
-        else 
-            ucase :: uncovereds
->>>>>>> 05cfc2f (service.elm typo fix)
+        ucase :: uncovereds
 
 determineCaseMsg : List (Int, Int) -> Int -> Int -> Msg
 determineCaseMsg bombPosList i j =
@@ -74,8 +63,5 @@ displayButtons model col row =
             button [class "grid-item case", id ("nb"++value) ] [ text value ]
     else
         let value = getValue model.uncovereds col row in
-<<<<<<< HEAD
         button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
-=======
-        button [class "grid-item case", onClick (determineCaseMsg model.listPosMine col row) ] [ text value ]
->>>>>>> 05cfc2f (service.elm typo fix)
+
