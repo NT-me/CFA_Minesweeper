@@ -5,16 +5,15 @@ import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class, style)
 import Service
 import Mine
-import Type exposing (Model)
-import Type exposing (Msg(..))
+import Type exposing (Model, Msg(..))
 import Service exposing (..)
 
 
 exampleGenerateRandomMines : Cmd Msg
 exampleGenerateRandomMines =
     Mine.generateRandomMines
-        { width = 10
-        , height = 10
+        { width = 9
+        , height = 9
         , minMines = 1
         , maxMines = 1
         , initialX = 0
@@ -36,7 +35,7 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none)
+    EmptyCase pos -> ({model | uncovereds = model.uncovereds ++ (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 

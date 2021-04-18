@@ -45,6 +45,12 @@ img {
   background-color: #8b0000;
 }
 
+#nb0{
+  border: dotted black;
+
+  background-color: white;
+}
+
 #nb1{
   border: 1px solid black;
   color: blue;

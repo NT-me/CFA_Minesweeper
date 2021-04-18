@@ -10,9 +10,8 @@ type alias Model =
     uncovereds : List UncoveredValueCase,
     bombClicked : Bool}
 
-
-    
 type alias UncoveredValueCase =
-    { value : Int
-    , position : (Int, Int) 
+    {
+    value : Int
+    , position : (Int, Int)
     }
