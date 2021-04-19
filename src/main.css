@@ -25,13 +25,33 @@ img {
   max-width: 200px;
 }
 
+.reset-button {
+  font-size : 220%;
+  background: rgba(0, 0, 0, 0);
+}
+
+.victory {
+  font-size : 500%;
+  color: green;
+  font-weight: bold;
+}
+
+.defeat {
+  color: red;
+  font-weight: bold;
+}
+
 
 .wrapper {
   display: grid;
-  /* grid-template-columns: repeat(3, 1fr); */
-  grid-gap: 10px;
-  grid-auto-rows: minmax(100px, auto);
-  margin : 10%
+  grid-gap: 0.2%;
+  grid-auto-rows: minmax(8vh, auto);
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+  margin-left: 10%;
+  margin-right: 10%;
+  /* position: fixed; */
+  /* z-index: 10; */
 }
 
 .case{
@@ -47,7 +67,6 @@ img {
 
 #nb0{
   border: dotted black;
-
   background-color: white;
 }
 

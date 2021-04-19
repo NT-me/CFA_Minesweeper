@@ -1,8 +1,9 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, div, h1, text)
+import Html exposing (Html, div, h1, text, button)
 import Html.Attributes exposing (class, style)
+import Html.Events exposing (onClick)
 import Service
 import Mine
 import Type exposing (Model, Msg(..))
@@ -35,12 +36,15 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase pos -> ({model | uncovereds = model.uncovereds ++ (uncoveredList model.listPosMine [] pos)}, Cmd.none)
+    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.flagedList model.uncovereds pos)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
-    FlagCase pos -> ({model | flagedList = model.flagedList ++ (addFlagList model.flagedList pos)}, Cmd.none)
+    FlagCase pos -> ({model | flagedList = pos :: model.flagedList}, Cmd.none)
 
+    UnFlagCase pos -> ({model | flagedList = List.filter (\x -> x /= pos) model.flagedList}, Cmd.none)
+
+    Reset -> init
 --🚩--
 --OnAnimationFrame
 
@@ -60,8 +64,15 @@ view model =
     div []
         [
         div [] [h1 [] [text "Démineur"]],
-        div [class "wrapper", style "grid-template-columns" "repeat(10, 1fr)"]
-          (Service.renderGrid [] 0 0 10 10 model)
+        if model.bombClicked then
+            div [] [button [class "reset-button", onClick Reset] [ text "(ಠ_ಠ)" ]]
+        else
+          div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],
+        if ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100 then
+          div [class "victory"] [ text "Bravo vous avez gagné !" ]
+        else
+          div [class "wrapper", style "grid-template-columns" "repeat(10, 1fr)"]
+            (Service.renderGrid [] 0 0 10 10 model)
         ]
 
 

@@ -5,6 +5,8 @@ type Msg
     | EmptyCase (Int, Int)
     | BombCase
     | FlagCase (Int, Int)
+    | UnFlagCase (Int, Int)
+    | Reset
 
 type alias Model =
     {listPosMine : List ( Int, Int ),

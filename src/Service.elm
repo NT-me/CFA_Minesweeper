@@ -1,13 +1,9 @@
 module Service exposing (..)
-
 import Html exposing (Html, text, button)
 import Html.Attributes exposing (class, id)
-import Html.Events exposing (onClick)
-import Type exposing (Model)
-import Type exposing (Msg(..))
-import Type exposing (UncoveredValueCase)
+import Html.Events exposing (onClick, custom)
+import Type exposing (Model, UncoveredValueCase, Msg(..))
 import String exposing (String)
-import Html.Events exposing (custom)
 import Json.Decode as Json
 
 
@@ -21,27 +17,32 @@ proximityBomb bombPosList posClick retValue =
                  else proximityBomb t posClick retValue
 
 
-recCase bombPosList uncovereds posClick =
+recCase bombPosList flagsList uncovereds posClick =
    let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-    if (((Tuple.first posClick) >= 0) && ((Tuple.first posClick) < 10) && ((Tuple.second posClick) >= 0) && ((Tuple.second posClick) < 10) && (not (List.member ucase uncovereds)))  then
+    if (((Tuple.first posClick) >= 0)
+      && ((Tuple.first posClick) < 10)
+      && ((Tuple.second posClick) >= 0)
+      && ((Tuple.second posClick) < 10)
+      && (not (List.member ucase uncovereds))
+      && (not(List.member posClick flagsList)))  then
       if ucase.value == 0 then
         let
           down =
-            (recCase bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1)))
+            (recCase bombPosList flagsList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1)))
           up =
-            (recCase bombPosList (down) (Tuple.first posClick, (Tuple.second posClick - 1)))
+            (recCase bombPosList flagsList (down) (Tuple.first posClick, (Tuple.second posClick - 1)))
           right =
-            (recCase bombPosList (up) ((Tuple.first posClick + 1), Tuple.second posClick))
+            (recCase bombPosList flagsList (up) ((Tuple.first posClick + 1), Tuple.second posClick))
           left =
-            (recCase bombPosList (right) ((Tuple.first posClick - 1), Tuple.second posClick))
+            (recCase bombPosList flagsList (right) ((Tuple.first posClick - 1), Tuple.second posClick))
           upleft =
-            (recCase bombPosList (left) ((Tuple.first posClick - 1), (Tuple.second posClick - 1)))
+            (recCase bombPosList flagsList (left) ((Tuple.first posClick - 1), (Tuple.second posClick - 1)))
           upright =
-            (recCase bombPosList (upleft) ((Tuple.first posClick + 1), (Tuple.second posClick - 1)))
+            (recCase bombPosList flagsList (upleft) ((Tuple.first posClick + 1), (Tuple.second posClick - 1)))
           downleft =
-            (recCase bombPosList (upright) ((Tuple.first posClick - 1), (Tuple.second posClick + 1))) 
+            (recCase bombPosList flagsList (upright) ((Tuple.first posClick - 1), (Tuple.second posClick + 1)))
           downright =
-            (recCase bombPosList (downleft) ((Tuple.first posClick + 1), (Tuple.second posClick + 1)))
+            (recCase bombPosList flagsList (downleft) ((Tuple.first posClick + 1), (Tuple.second posClick + 1)))
         in
          downright
       else
@@ -49,11 +50,11 @@ recCase bombPosList uncovereds posClick =
     else
       uncovereds
 
-uncoveredList : List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
-uncoveredList bombPosList uncovereds posClick =
+uncoveredList : List (Int, Int) -> List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
+uncoveredList bombPosList flagsList uncovereds posClick =
      let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-        if ucase.value == 0  then
-          recCase bombPosList [] posClick 
+        if ucase.value == 0 && (not(List.member posClick flagsList))  then
+          recCase bombPosList flagsList uncovereds posClick
         else
             ucase :: uncovereds
 
@@ -65,6 +66,7 @@ determineCaseMsg bombPosList i j =
           BombCase
           else
               determineCaseMsg t i j
+
 renderGrid : List (Html Msg) -> Int -> Int -> Int -> Int -> Model ->List (Html Msg)
 renderGrid msgList col row maxCol maxRow model =
   if col >= maxCol then
@@ -84,14 +86,14 @@ getValue uncoveredcases col row =
                 else
                     getValue t col row
 
-addFlagList flagList pos =
-    case [] -> let flag = {value = True, position = pos} in
-                flag :: flagList
-    h :: t -> if h.position == pos then
-                  t
-              else
-                  addFlagList t pos
-
+caseIsFlag : List (Int , Int) -> (Int , Int) -> Bool
+caseIsFlag listFlags pos =
+    case listFlags of
+        [] -> False
+        h :: t -> if pos == h then
+            True
+          else
+            caseIsFlag t pos
 
 displayButtons : Model -> Int -> Int -> Html Msg
 displayButtons model col row =
@@ -108,7 +110,10 @@ displayButtons model col row =
         let value = getValue model.uncovereds col row in
         if value == "0" then
             button [class "grid-item case", id ("nb"++value) ] []
-        else if value == " " then
+        else if value == " " then -- Cas vide
+          if caseIsFlag model.flagedList (col , row) then
+            button [class "grid-item case", id ("nb"++value), onRightClick (UnFlagCase (col,row)) ] [ text "🚩" ]
+          else
             button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row), onRightClick (FlagCase (col,row)) ] []
         else
             button [class "grid-item case", id ("nb"++value)] [ text value ]
