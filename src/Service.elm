@@ -7,7 +7,8 @@ import Type exposing (Model)
 import Type exposing (Msg(..))
 import Type exposing (UncoveredValueCase)
 import String exposing (String)
-import Html.Events exposing (onDoubleClick)
+import Html.Events exposing (custom)
+import Json.Decode as Json
 
 
 proximityBomb : List (Int, Int) ->(Int, Int) -> Int -> Int
@@ -33,8 +34,16 @@ recCase bombPosList uncovereds posClick =
             (recCase bombPosList (up) ((Tuple.first posClick + 1), Tuple.second posClick))
           left =
             (recCase bombPosList (right) ((Tuple.first posClick - 1), Tuple.second posClick))
+          upleft =
+            (recCase bombPosList (left) ((Tuple.first posClick - 1), (Tuple.second posClick - 1)))
+          upright =
+            (recCase bombPosList (upleft) ((Tuple.first posClick + 1), (Tuple.second posClick - 1)))
+          downleft =
+            (recCase bombPosList (upright) ((Tuple.first posClick - 1), (Tuple.second posClick + 1))) 
+          downright =
+            (recCase bombPosList (downleft) ((Tuple.first posClick + 1), (Tuple.second posClick + 1)))
         in
-         left
+         downright
       else
         ucase :: uncovereds
     else
@@ -75,6 +84,15 @@ getValue uncoveredcases col row =
                 else
                     getValue t col row
 
+addFlagList flagList pos =
+    case [] -> let flag = {value = True, position = pos} in
+                flag :: flagList
+    h :: t -> if h.position == pos then
+                  t
+              else
+                  addFlagList t pos
+
+
 displayButtons : Model -> Int -> Int -> Html Msg
 displayButtons model col row =
     if model.bombClicked then
@@ -91,6 +109,16 @@ displayButtons model col row =
         if value == "0" then
             button [class "grid-item case", id ("nb"++value) ] []
         else if value == " " then
-            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row), onDoubleClick (FlagCase) ] []
+            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row), onRightClick (FlagCase (col,row)) ] []
         else
             button [class "grid-item case", id ("nb"++value)] [ text value ]
+
+onRightClick : msg -> Html.Attribute msg
+onRightClick msg =
+    custom "contextmenu"
+        (Json.succeed
+            { message = msg
+            , stopPropagation = True
+            , preventDefault = True
+            }
+        )
