@@ -24,15 +24,15 @@ recCase bombPosList uncovereds posClick =
    let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
     if (((Tuple.first posClick) >= 0) && ((Tuple.first posClick) < 10) && ((Tuple.second posClick) >= 0) && ((Tuple.second posClick) < 10) && (not (List.member ucase uncovereds)))  then
       if ucase.value == 0 then
-        let 
-          down = 
-            (recCase bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1))) 
-          up = 
+        let
+          down =
+            (recCase bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1)))
+          up =
             (recCase bombPosList (down) (Tuple.first posClick, (Tuple.second posClick - 1)))
-          right = 
+          right =
             (recCase bombPosList (up) ((Tuple.first posClick + 1), Tuple.second posClick))
-          left = 
-            (recCase bombPosList (right) ((Tuple.first posClick - 1), Tuple.second posClick))  
+          left =
+            (recCase bombPosList (right) ((Tuple.first posClick - 1), Tuple.second posClick))
         in
          left
       else

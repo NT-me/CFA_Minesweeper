@@ -35,7 +35,7 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase pos -> ({model | uncovereds = model.uncovereds ++ (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none)
+    EmptyCase pos -> ({model | uncovereds = model.uncovereds ++ (uncoveredList model.listPosMine [] pos)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
