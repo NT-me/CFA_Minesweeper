@@ -7,6 +7,7 @@ import Type exposing (Model)
 import Type exposing (Msg(..))
 import Type exposing (UncoveredValueCase)
 import String exposing (String)
+import Html.Events exposing (onDoubleClick)
 
 
 proximityBomb : List (Int, Int) ->(Int, Int) -> Int -> Int
@@ -18,41 +19,22 @@ proximityBomb bombPosList posClick retValue =
                             proximityBomb t posClick (retValue + 1)
                  else proximityBomb t posClick retValue
 
-recDown bombPosList uncovereds posClick =
-  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-    if (((Tuple.second posClick) < 10) &&  (not (List.member ucase uncovereds)))  then
-      if ucase.value == 0 then
-        recDown bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1))
-      else
-        ucase :: uncovereds
-    else
-      uncovereds
 
-recUp bombPosList uncovereds posClick =
-  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-    if (((Tuple.second posClick) >= 0) &&  (not (List.member ucase uncovereds)))  then
+recCase bombPosList uncovereds posClick =
+   let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
+    if (((Tuple.first posClick) >= 0) && ((Tuple.first posClick) < 10) && ((Tuple.second posClick) >= 0) && ((Tuple.second posClick) < 10) && (not (List.member ucase uncovereds)))  then
       if ucase.value == 0 then
-        recUp bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick - 1))
-      else
-        ucase :: uncovereds
-    else
-      uncovereds
-
-recRight bombPosList uncovereds posClick =
-  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-    if (((Tuple.first posClick) < 10) &&  (not (List.member ucase uncovereds)))  then
-      if ucase.value == 0 then
-        recRight bombPosList (ucase :: uncovereds) ((Tuple.first posClick + 1), Tuple.second posClick)
-      else
-        ucase :: uncovereds
-    else
-      uncovereds
-
-recLeft bombPosList uncovereds posClick =
-  let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
-    if (((Tuple.first posClick) >= 0) &&  (not (List.member ucase uncovereds)))  then
-      if ucase.value == 0 then
-        recRight bombPosList (ucase :: uncovereds) ((Tuple.first posClick - 1), Tuple.second posClick)
+        let 
+          down = 
+            (recCase bombPosList (ucase :: uncovereds) (Tuple.first posClick, (Tuple.second posClick + 1))) 
+          up = 
+            (recCase bombPosList (down) (Tuple.first posClick, (Tuple.second posClick - 1)))
+          right = 
+            (recCase bombPosList (up) ((Tuple.first posClick + 1), Tuple.second posClick))
+          left = 
+            (recCase bombPosList (right) ((Tuple.first posClick - 1), Tuple.second posClick))  
+        in
+         left
       else
         ucase :: uncovereds
     else
@@ -62,7 +44,7 @@ uncoveredList : List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> Li
 uncoveredList bombPosList uncovereds posClick =
      let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
         if ucase.value == 0  then
-          (recDown bombPosList [] posClick) ++ (recUp bombPosList [] posClick) ++ (recRight bombPosList [] posClick)
+          recCase bombPosList [] posClick 
         else
             ucase :: uncovereds
 
@@ -100,12 +82,15 @@ displayButtons model col row =
             button [class "grid-item case", id "bomb" ] [ text "💣"]
         else
             let value = getValue model.uncovereds col row in
-            button [class "grid-item case", id ("nb"++value) ] [ text value ]
+            if value == "0" then
+                button [class "grid-item case", id ("nb"++value) ] []
+            else
+                button [class "grid-item case", id ("nb"++value) ] [ text value ]
     else
         let value = getValue model.uncovereds col row in
         if value == "0" then
-            button [class "grid-item case", id ("nb"++value) ] [] --TODO : changer le CSS pour reconnaitre les cases clickées
+            button [class "grid-item case", id ("nb"++value) ] []
         else if value == " " then
-            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row) ] []
+            button [class "grid-item case", id ("nb"++value), onClick (determineCaseMsg model.listPosMine col row), onDoubleClick (FlagCase) ] []
         else
             button [class "grid-item case", id ("nb"++value)] [ text value ]

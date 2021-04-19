@@ -4,6 +4,7 @@ type Msg
     = MinesGenerated (List ( Int, Int ))
     | EmptyCase (Int, Int)
     | BombCase
+    | FlagCase
 
 type alias Model =
     {listPosMine : List ( Int, Int ),

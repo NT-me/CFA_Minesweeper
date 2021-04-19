@@ -14,8 +14,8 @@ exampleGenerateRandomMines =
     Mine.generateRandomMines
         { width = 9
         , height = 9
-        , minMines = 1
-        , maxMines = 1
+        , minMines = 10
+        , maxMines = 10
         , initialX = 0
         , initialY = 0
         }
@@ -38,6 +38,8 @@ update msg model =
     EmptyCase pos -> ({model | uncovereds = model.uncovereds ++ (uncoveredList model.listPosMine model.uncovereds pos)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
+
+    FlagCase -> ({model |bombClicked = True}, Cmd.none)
 
 
 --OnAnimationFrame
