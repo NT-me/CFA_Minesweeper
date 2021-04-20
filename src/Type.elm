@@ -1,7 +1,6 @@
 module Type exposing (..)
 import Time
 
-
 type Msg
     = MinesGenerated (List ( Int, Int ))
     | EmptyCase (Int, Int)
