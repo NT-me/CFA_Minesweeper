@@ -12,7 +12,8 @@ type alias Model =
     {listPosMine : List ( Int, Int ),
     uncovereds : List UncoveredValueCase,
     bombClicked : Bool,
-    flagedList: List ( Int, Int )}
+    flagedList: List ( Int, Int ),
+    numberCaseClicked: Int}
 
 type alias UncoveredValueCase =
     {

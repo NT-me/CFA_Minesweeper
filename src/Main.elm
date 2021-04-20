@@ -25,7 +25,7 @@ exampleGenerateRandomMines =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [] }, exampleGenerateRandomMines )
+    ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [], numberCaseClicked = 0 }, exampleGenerateRandomMines )
 
 
 
@@ -36,7 +36,7 @@ update msg model =
   case msg of
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
-    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.flagedList model.uncovereds pos)}, Cmd.none)
+    EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.flagedList model.uncovereds pos), numberCaseClicked = (model.numberCaseClicked + 1)}, Cmd.none)
 
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
@@ -64,14 +64,20 @@ view model =
     div []
         [
         div [] [h1 [] [text "Démineur"]],
-        if model.bombClicked then
+
+        div [class "headers"] [
+          div [] [h1 [] [text ("Cases cliquées: " ++ (String.fromInt model.numberCaseClicked))]],
+          if model.bombClicked then
             div [] [button [class "reset-button", onClick Reset] [ text "(ಠ_ಠ)" ]]
-        else
-          div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],
+          else
+            div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],
+          div [] [h1 [] [text "Secondes écoulées: "]]
+        ],
+        
         if ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100 then
           div [class "victory"] [ text "Bravo vous avez gagné !" ]
         else
-          div [class "wrapper", style "grid-template-columns" "repeat(10, 1fr)"]
+          div [class "wrapper"]
             (Service.renderGrid [] 0 0 10 10 model)
         ]
 
