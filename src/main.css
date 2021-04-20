@@ -57,21 +57,22 @@ img {
 
 .wrapper {
   display: grid;
-  grid-gap: 0.2%;
+  justify-content: center;
+  /* grid-gap: 0.2%; */
   grid-auto-rows: minmax(8vh, auto);
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(10, 8vh);
   margin-top: 2vh;
   margin-bottom: 2vh;
   margin-left: 10%;
   margin-right: 10%;
-  /* position: fixed; */
-  /* z-index: 10; */
+
 }
 
 .case{
+  height: 7vh;
+  width: 7vh;
   border: 1px solid;
   font-size : 220%;
-
 }
 
 #bomb{

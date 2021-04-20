@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Browser
+import Time
 import Html exposing (Html, div, h1, text, button)
 import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
@@ -15,8 +16,8 @@ exampleGenerateRandomMines =
     Mine.generateRandomMines
         { width = 9
         , height = 9
-        , minMines = 5
-        , maxMines = 5
+        , minMines = 10
+        , maxMines = 35
         , initialX = 0
         , initialY = 0
         }
@@ -25,7 +26,7 @@ exampleGenerateRandomMines =
 
 init : ( Model, Cmd Msg )
 init =
-    ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [], numberCaseClicked = 0 }, exampleGenerateRandomMines )
+    ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [], numberCaseClicked = 0, time = 0 }, exampleGenerateRandomMines )
 
 
 
@@ -45,6 +46,8 @@ update msg model =
     UnFlagCase pos -> ({model | flagedList = List.filter (\x -> x /= pos) model.flagedList}, Cmd.none)
 
     Reset -> init
+
+    Tick posix -> ({model | time = (if (model.bombClicked || ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100) then model.time else (model.time + 1))}, Cmd.none)
 --🚩--
 --OnAnimationFrame
 
@@ -71,9 +74,9 @@ view model =
             div [] [button [class "reset-button", onClick Reset] [ text "(ಠ_ಠ)" ]]
           else
             div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],
-          div [] [h1 [] [text "Secondes écoulées: "]]
+          div [] [h1 [] [text ("Secondes écoulées: " ++ (String.fromInt model.time))]]
         ],
-        
+
         if ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100 then
           div [class "victory"] [ text "Bravo vous avez gagné !" ]
         else
@@ -88,5 +91,9 @@ main =
         { view = view
         , init = always init
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Time.every 1000 Tick
