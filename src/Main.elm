@@ -10,7 +10,7 @@ import Mine
 import Type exposing (Model, Msg(..))
 import Service exposing (..)
 
-
+--Settings of the game
 exampleGenerateRandomMines : Cmd Msg
 exampleGenerateRandomMines =
     Mine.generateRandomMines
@@ -23,7 +23,8 @@ exampleGenerateRandomMines =
         }
         MinesGenerated
 
-
+--Initialization, all lists are empty, no bomb is clicked, no case is uncovered, 
+--timer setted to 0 and game parameters are given trought exampleGenerateRandomMines
 init : ( Model, Cmd Msg )
 init =
     ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [], numberCaseClicked = 0, time = 0 }, exampleGenerateRandomMines )
@@ -38,7 +39,7 @@ update msg model =
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
     EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.flagedList model.uncovereds pos), numberCaseClicked = (model.numberCaseClicked + 1)}, Cmd.none)
-
+    
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
     FlagCase pos -> ({model | flagedList = pos :: model.flagedList}, Cmd.none)
@@ -49,19 +50,8 @@ update msg model =
 
     Tick posix -> ({model | time = (if (model.bombClicked || ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100) then model.time else (model.time + 1))}, Cmd.none)
 --🚩--
---OnAnimationFrame
 
-
-
---tabGrid : List (Int Int) -> List (Int Int)-> Int -> Int -> Int -> Int -> List (Int Int)
---tabGrid posMine retList col row maxCol maxRow =
-  --  case posMine of
-    --    [] -> retList
-      --  h :: t ->
-
--- Valeur de retour, 0, 0, maximum colonne, maximum ligne
-
-
+--The actual web page displayed by the program
 view : Model -> Html Msg
 view model =
     div []
@@ -71,12 +61,13 @@ view model =
         div [class "headers"] [
           div [] [h1 [] [text ("Cases cliquées: " ++ (String.fromInt model.numberCaseClicked))]],
           if model.bombClicked then
+            --Losing condition, a bombcase is uncovered 
             div [] [button [class "reset-button", onClick Reset] [ text "(ಠ_ಠ)" ]]
           else
             div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],
           div [] [h1 [] [text ("Secondes écoulées: " ++ (String.fromInt model.time))]]
         ],
-
+        --Winning condition -> all unbombed case are uncovered
         if ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100 then
           div [class "victory"] [ text "Bravo vous avez gagné !" ]
         else

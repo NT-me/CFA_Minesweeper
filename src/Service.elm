@@ -16,9 +16,10 @@ proximityBomb bombPosList posClick retValue =
                             proximityBomb t posClick (retValue + 1)
                  else proximityBomb t posClick retValue
 
-
+--This function uncovers cases next to the one clicked, in case that they are not sitting nect to a bomb
 recCase bombPosList flagsList uncovereds posClick =
    let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
+    --Test to ensure that position is included on the grid & the case has no been already uncovered/flagged
     if (((Tuple.first posClick) >= 0)
       && ((Tuple.first posClick) < 10)
       && ((Tuple.second posClick) >= 0)
@@ -50,6 +51,7 @@ recCase bombPosList flagsList uncovereds posClick =
     else
       uncovereds
 
+--Parse 
 uncoveredList : List (Int, Int) -> List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
 uncoveredList bombPosList flagsList uncovereds posClick =
      let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
@@ -58,25 +60,28 @@ uncoveredList bombPosList flagsList uncovereds posClick =
         else
             ucase :: uncovereds
 
+--Parse cases to bind bombs
 determineCaseMsg : List (Int, Int) -> Int -> Int -> Msg
 determineCaseMsg bombPosList i j =
     case bombPosList of
-      [] -> EmptyCase (i,j)
+      [] -> EmptyCase (i,j) --should never happend
       h :: t -> if (h == (i, j)) then
           BombCase
           else
               determineCaseMsg t i j
 
+--
 renderGrid : List (Html Msg) -> Int -> Int -> Int -> Int -> Model ->List (Html Msg)
 renderGrid msgList col row maxCol maxRow model =
   if col >= maxCol then
       if row == (maxRow - 1)  then
-          msgList -- Retour de la grille de bouton
+          msgList --Return a grid of cases (sawable on the Html)
       else
           renderGrid msgList 0 (row + 1) maxCol maxRow model -- On change de ligne
   else
       renderGrid (List.append msgList ((displayButtons model col row) :: [])) (col + 1) row maxCol maxRow model
 
+--Return the value of a case if there is one, empty string otherwise
 getValue : List (UncoveredValueCase) -> Int -> Int -> String
 getValue uncoveredcases col row =
     case uncoveredcases of
@@ -86,6 +91,7 @@ getValue uncoveredcases col row =
                 else
                     getValue t col row
 
+--Manage the flags, return true if case is a flag, false otherwise
 caseIsFlag : List (Int , Int) -> (Int , Int) -> Bool
 caseIsFlag listFlags pos =
     case listFlags of
@@ -95,6 +101,7 @@ caseIsFlag listFlags pos =
           else
             caseIsFlag t pos
 
+--Manage the display on the cases of the grid
 displayButtons : Model -> Int -> Int -> Html Msg
 displayButtons model col row =
     if model.bombClicked then
@@ -118,6 +125,7 @@ displayButtons model col row =
         else
             button [class "grid-item case", id ("nb"++value)] [ text value ]
 
+--Manage the right click
 onRightClick : msg -> Html.Attribute msg
 onRightClick msg =
     custom "contextmenu"
