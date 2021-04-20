@@ -23,31 +23,35 @@ exampleGenerateRandomMines =
         }
         MinesGenerated
 
---Initialization, all lists are empty, no bomb is clicked, no case is uncovered, 
+--Initialization, all lists are empty, no bomb is clicked, no case is uncovered,
 --timer setted to 0 and game parameters are given trought exampleGenerateRandomMines
 init : ( Model, Cmd Msg )
 init =
     ( {listPosMine = [], uncovereds = [], bombClicked = False, flagedList = [], numberCaseClicked = 0, time = 0 }, exampleGenerateRandomMines )
 
 
-
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
+    -- Fill mines list with random position
     MinesGenerated v -> ({model | listPosMine = v}, Cmd.none)
 
+    -- For every cases who's not a bomb add case position into list
     EmptyCase pos -> ({model | uncovereds = (uncoveredList model.listPosMine model.flagedList model.uncovereds pos), numberCaseClicked = (model.numberCaseClicked + 1)}, Cmd.none)
-    
+
+    -- If user clicked on bomb switch BombCase boolean on True
     BombCase -> ({model | bombClicked = True}, Cmd.none)
 
+    -- Add flag position into list
     FlagCase pos -> ({model | flagedList = pos :: model.flagedList}, Cmd.none)
 
+    -- Remove flag position from list
     UnFlagCase pos -> ({model | flagedList = List.filter (\x -> x /= pos) model.flagedList}, Cmd.none)
 
+    -- Reset grid/timer/counter
     Reset -> init
 
+    -- Increment value every second
     Tick posix -> ({model | time = (if (model.bombClicked || ((List.length model.listPosMine) + (List.length model.uncovereds)) == 100) then model.time else (model.time + 1))}, Cmd.none)
 --🚩--
 
@@ -61,7 +65,7 @@ view model =
         div [class "headers"] [
           div [] [h1 [] [text ("Cases cliquées: " ++ (String.fromInt model.numberCaseClicked))]],
           if model.bombClicked then
-            --Losing condition, a bombcase is uncovered 
+            --Losing condition, a bombcase is uncovered
             div [] [button [class "reset-button", onClick Reset] [ text "(ಠ_ಠ)" ]]
           else
             div [] [button [class "reset-button", onClick Reset] [ text "(｡◕‿◕｡)" ]],

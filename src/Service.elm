@@ -6,7 +6,7 @@ import Type exposing (Model, UncoveredValueCase, Msg(..))
 import String exposing (String)
 import Json.Decode as Json
 
-
+-- Determine the value to put into a case according to the bomb proximity
 proximityBomb : List (Int, Int) ->(Int, Int) -> Int -> Int
 proximityBomb bombPosList posClick retValue =
     case bombPosList of
@@ -16,7 +16,7 @@ proximityBomb bombPosList posClick retValue =
                             proximityBomb t posClick (retValue + 1)
                  else proximityBomb t posClick retValue
 
---This function uncovers cases next to the one clicked, in case that they are not sitting nect to a bomb
+--This function add cases next to clicked case into uncovered list (list who's show into model) recursively
 recCase bombPosList flagsList uncovereds posClick =
    let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
     --Test to ensure that position is included on the grid & the case has no been already uncovered/flagged
@@ -51,7 +51,7 @@ recCase bombPosList flagsList uncovereds posClick =
     else
       uncovereds
 
---Parse 
+-- This function add cases into uncovered list
 uncoveredList : List (Int, Int) -> List (Int, Int) -> List (UncoveredValueCase) -> (Int, Int) -> List (UncoveredValueCase)
 uncoveredList bombPosList flagsList uncovereds posClick =
      let ucase = {value = (proximityBomb bombPosList posClick 0), position = posClick} in
@@ -60,7 +60,7 @@ uncoveredList bombPosList flagsList uncovereds posClick =
         else
             ucase :: uncovereds
 
---Parse cases to bind bombs
+-- Determine which message must be send when user clicked on case
 determineCaseMsg : List (Int, Int) -> Int -> Int -> Msg
 determineCaseMsg bombPosList i j =
     case bombPosList of
@@ -70,7 +70,7 @@ determineCaseMsg bombPosList i j =
           else
               determineCaseMsg t i j
 
---
+-- Show grid of cases
 renderGrid : List (Html Msg) -> Int -> Int -> Int -> Int -> Model ->List (Html Msg)
 renderGrid msgList col row maxCol maxRow model =
   if col >= maxCol then
@@ -81,7 +81,7 @@ renderGrid msgList col row maxCol maxRow model =
   else
       renderGrid (List.append msgList ((displayButtons model col row) :: [])) (col + 1) row maxCol maxRow model
 
---Return the value of a case if there is one, empty string otherwise
+-- Return the value of a case if there is one, empty string otherwise
 getValue : List (UncoveredValueCase) -> Int -> Int -> String
 getValue uncoveredcases col row =
     case uncoveredcases of
@@ -91,7 +91,7 @@ getValue uncoveredcases col row =
                 else
                     getValue t col row
 
---Manage the flags, return true if case is a flag, false otherwise
+-- Manage the flags, return true if case is a flag, false otherwise
 caseIsFlag : List (Int , Int) -> (Int , Int) -> Bool
 caseIsFlag listFlags pos =
     case listFlags of
@@ -101,7 +101,7 @@ caseIsFlag listFlags pos =
           else
             caseIsFlag t pos
 
---Manage the display on the cases of the grid
+-- Manage the display on the cases of the grid
 displayButtons : Model -> Int -> Int -> Html Msg
 displayButtons model col row =
     if model.bombClicked then
@@ -125,7 +125,7 @@ displayButtons model col row =
         else
             button [class "grid-item case", id ("nb"++value)] [ text value ]
 
---Manage the right click
+-- Create the right click
 onRightClick : msg -> Html.Attribute msg
 onRightClick msg =
     custom "contextmenu"
